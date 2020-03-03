@@ -19,12 +19,12 @@ class TicTacToeEnv(gym.Env):
         self.observation_space = spaces.Discrete(TOTAL_BOARD_SPACES)
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.gameOver = False
-        self.playerTurn = 0
+        self.playerTurn = 1
     
     def reset(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.gameOver = False
-        self.playerTurn = 0
+        self.playerTurn = 1
         
     def step(self, action):
         self.board[action[0],action[1]] = self.playerTurn
@@ -32,7 +32,7 @@ class TicTacToeEnv(gym.Env):
         if reward is not None:
             self.gameOver = True
         # Switch to other player
-        self.playerTurn = 0 if self.playerTurn == 1 else 1
+        self.playerTurn = -1 if self.playerTurn == 1 else 1
         return self.board, reward, self.gameOver, self.getHash()
     
     def render(self):
