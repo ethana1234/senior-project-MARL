@@ -1,0 +1,7 @@
+README.md
+setup.py
+connect4.egg-info/PKG-INFO
+connect4.egg-info/SOURCES.txt
+connect4.egg-info/dependency_links.txt
+connect4.egg-info/requires.txt
+connect4.egg-info/top_level.txt
