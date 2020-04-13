@@ -1,6 +1,6 @@
 from gym.envs.registration import register
 
 register(
-    id='tttenv-v0',
-    entry_point='tttenv.envs:TicTacToeEnv',
+    id='connect4env-v0',
+    entry_point='connect4env.envs:Connect4Env',
 )
