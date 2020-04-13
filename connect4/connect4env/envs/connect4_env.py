@@ -14,12 +14,13 @@ class Connect4Env(gym.Env):
     def __init__(self):
         super(Connect4Env, self).__init__()
         
-        # Board is always 3x3 for tic tac toe
+        # Board is always 6x7 for connect4
         self.action_space = spaces.Discrete(TOTAL_BOARD_SPACES)
         self.observation_space = spaces.Discrete(TOTAL_BOARD_SPACES)
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.gameOver = False
         self.playerTurn = 1
+        self.curRows = {curRow: 0 for curRow in range(BOARD_COLS)}
     
     def reset(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
@@ -27,7 +28,7 @@ class Connect4Env(gym.Env):
         self.playerTurn = 1
         
     def step(self, column):
-        row = findRow(column)
+        row = self.curRows[column]
         self.board[row,column] = self.playerTurn
         reward = self.winner(row,column)
         if reward is not None:
