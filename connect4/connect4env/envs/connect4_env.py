@@ -20,17 +20,18 @@ class Connect4Env(gym.Env):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.gameOver = False
         self.playerTurn = 1
-        self.curRows = {curRow: 0 for curRow in range(BOARD_COLS)}
+        self.curRows = {curRow: BOARD_ROWS for curRow in range(BOARD_COLS)}
     
     def reset(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.gameOver = False
         self.playerTurn = 1
         
-    def step(self, column):
-        row = self.curRows[column]
-        self.board[row,column] = self.playerTurn
-        reward = self.winner(row,column)
+    def step(self, action):
+        row,col = action[0],action[1]
+        self.board[row,col] = self.playerTurn
+        self.curRows[col] -= 1
+        reward = self.winner(row,col)
         if reward is not None:
             self.gameOver = True
         # Switch to other player
@@ -74,51 +75,39 @@ class Connect4Env(gym.Env):
         for i in range(3):
             # p1 wins
             if sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i),column]) == 4:
-                self.gameOver = True
                 return (1, 0)
             # p2 wins
             elif sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i), column]) == -4:
-                self.gameOver = True
                 return (0, 1)
         # Row win 
             elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS,column+4-i)]) == 4:
-                self.gameOver = True
                 return (1, 0)
             elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS, column+4-i)]) == -4:
-                self.gameOver = True
                 return (0, 1)
 
-            diag = self.board.diagonal(axis1=row, axis2=column)
+            diag = self.board.diagonal()
 
             if len(diag) >= 4:
                 for i in range(len(diag)-4):
                     if sum(diag[i:i+4]) == 4:
-                        self.gameOver = True
                         return (1, 0)
                     if sum(diag[i:i+4]) == -4:
-                        self.gameOver = True
                         return (0, 1)
                     if sum(diag[i+4:i]) == 4:
-                        self.gameOver = True
                         return (1, 0)
                     if sum(diag[i+4:i]) == -4:
-                        self.gameOver = True
                         return (0, 1)
 
-            diag2 = np.rot90(board).diagonal(axis1=column, axis2=row)
+            diag2 = np.rot90(self.board).diagonal()
             if len(diag2) >= 4:
                 for i in range(len(diag2)-4):
                     if sum(diag2[i:i+4]) == 4:
-                        self.gameOver = True
                         return (1, 0)
                     if sum(diag2[i:i+4]) == -4:
-                        self.gameOver = True
                         return (0, 1)
                     if sum(diag2[i+4:i]) == 4:
-                        self.gameOver = True
                         return (1, 0)
                     if sum(diag2[i+4:i]) == -4:
-                        self.gameOver = True
                         return (0, 1)
                     
         
@@ -128,6 +117,5 @@ class Connect4Env(gym.Env):
             return (0.1, 0.5)
         
         # Game not over
-        self.gameOver = False
         return None
     
