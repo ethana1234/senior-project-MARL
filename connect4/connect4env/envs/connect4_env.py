@@ -74,15 +74,15 @@ class Connect4Env(gym.Env):
         # Col win
         for i in range(4):
             # p1 wins
-            if sum(self.board[max(0,row-i):min(BOARD_ROWS,row+4-i),column]) == 4:
+            if sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i),column]) == 4:
                 return (1, 0)
             # p2 wins
-            elif sum(self.board[max(0,row-i):min(BOARD_ROWS,row+4-i), column]) == -4:
+            elif sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i), column]) == -4:
                 return (0, 1)
         # Row win 
-            elif sum(self.board[row, max(0,column-i):min(BOARD_COLS,column+4-i)]) == 4:
+            elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS,column+4-i)]) == 4:
                 return (1, 0)
-            elif sum(self.board[row, max(0,column-i):min(BOARD_COLS, column+4-i)]) == -4:
+            elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS, column+4-i)]) == -4:
                 return (0, 1)
 
         diag = self.board.diagonal(offset = column-row)
