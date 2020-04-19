@@ -72,15 +72,16 @@ class Connect4Env(gym.Env):
     # After each move, check if there's a winner and give out rewards
     def winner(self, row, column):
         # Col win
+        # p1 wins
+        if sum(self.board[row:min(BOARD_COLS,row+4),column]) == 4:
+            return (1, 0)
+        # p2 wins
+        elif sum(self.board[row:min(BOARD_COLS,row+4), column]) == -4:
+            return (0, 1)
+
         for i in range(4):
-            # p1 wins
-            if sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i),column]) == 4:
-                return (1, 0)
-            # p2 wins
-            elif sum(self.board[max(0,row-i):min(BOARD_COLS,row+4-i), column]) == -4:
-                return (0, 1)
         # Row win 
-            elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS,column+4-i)]) == 4:
+            if sum(self.board[row, max(0,column-i):min(BOARD_ROWS,column+4-i)]) == 4:
                 return (1, 0)
             elif sum(self.board[row, max(0,column-i):min(BOARD_ROWS, column+4-i)]) == -4:
                 return (0, 1)
@@ -88,26 +89,35 @@ class Connect4Env(gym.Env):
         diag = self.board.diagonal(offset = column-row)
 
         if len(diag) >= 4:
-            for i in range(len(diag)-4):
+            for i in range(len(diag)-3):
                 if sum(diag[i:i+4]) == 4:
                     return (1, 0)
                 if sum(diag[i:i+4]) == -4:
                     return (0, 1)
-                if sum(diag[i+4:i]) == 4:
+                if sum(diag[i-4:i]) == 4:
                     return (1, 0)
-                if sum(diag[i+4:i]) == -4:
+                if sum(diag[i-4:i]) == -4:
                     return (0, 1)
 
-        diag2 = np.fliplr(self.board).diagonal(offset = column-row)
+#TODO
+#failure example test case
+#a=np.array([0,0,0,0,0,0,0]*6)
+#a[4][0]=1
+#a[3][1]=1
+#a[2][2]=1
+#a[1][3]=1
+#winner(a, 4,0)
+
+        diag2 = np.fliplr(self.board).diagonal(offset = row-column)
         if len(diag2) >= 4:
-            for i in range(len(diag2)-4):
+            for i in range(len(diag2)-3):
                 if sum(diag2[i:i+4]) == 4:
                     return (1, 0)
                 if sum(diag2[i:i+4]) == -4:
                     return (0, 1)
-                if sum(diag2[i+4:i]) == 4:
+                if sum(diag2[i-4:i]) == 4:
                     return (1, 0)
-                if sum(diag2[i+4:i]) == -4:
+                if sum(diag2[i-4:i]) == -4:
                     return (0, 1)
                     
         
