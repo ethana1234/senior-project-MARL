@@ -9,6 +9,7 @@ COORD_TO_INDEX = lambda x : (x[0] * BOARD_ROWS) + x[1]
 
 # Class that implements the Gym Environment Interface
 class TicTacToeEnv(gym.Env):
+    '''Class that implements the Gym Environment Interface'''
     metadata = {'render.modes': ['human']}
     
     def __init__(self):
@@ -51,8 +52,8 @@ class TicTacToeEnv(gym.Env):
             print(out)
         print('-------------')
         
-    # Update vacant positions after a turn is made
     def availablePositions(self):
+        '''Update vacant positions after a turn is made'''
         positions = []
         for i in range(BOARD_ROWS):
             for j in range(BOARD_COLS):
@@ -61,43 +62,23 @@ class TicTacToeEnv(gym.Env):
                     positions.append((i,j))
         return positions
         
-    # Get a unique hash value that corresponds with the current board state
-    # This is used to store the board state in a state-value dictionary
     def getHash(self):
+        '''Get a unique hash value that corresponds with the current board state.
+        This is used to store the board state in a state-value dictionary'''
         return str(self.board.reshape(BOARD_ROWS * BOARD_COLS))
         
-    # After each move, check if there's a winner and give out rewards
     def winner(self):
-        # Row win
-        for i in range(BOARD_ROWS):
-            # p1 wins
-            if sum(self.board[i, :]) == 3:
-                self.gameOver = True
-                return (1, 0)
-            # p2 wins
-            elif sum(self.board[i, :]) == -3:
-                self.gameOver = True
-                return (0, 1)
-            
-        # Column win 
-        for i in range(BOARD_COLS):
-            if sum(self.board[:, i]) == 3:
-                self.gameOver = True
-                return (1, 0)
-            elif sum(self.board[:, i]) == -3:
-                self.gameOver = True
-                return (0, 1)
-            
-        # Diagonal win
-        diag1 = sum([self.board[i, i] for i in range(BOARD_COLS)])
-        diag2 = sum([self.board[i, BOARD_COLS - i - 1] for i in range(BOARD_COLS)])
-        if diag1 == 3 or diag2 == 3:
-            self.gameOver = True
-            return (1, 0)
-        elif diag1 == -3 or diag2 == -3:
-            self.gameOver = True
-            return (0, 1)
-        
+        ''' After each move, check if there's a winner and give out rewards'''
+        # Player 1 win
+        mask = (self.board == 1)
+        if mask.all(0).any() or mask.all(1).any() or mask.diagonal().all() or np.fliplr(mask).diagonal().all():
+            return (1,0)
+
+        # Player 2 win
+        mask = (self.board == -1)
+        if mask.all(0).any() or mask.all(1).any() or mask.diagonal().all() or np.fliplr(mask).diagonal().all():
+            return (0,1)
+
         # Tie
         if not len(self.availablePositions()):
             self.gameOver = True
@@ -106,5 +87,3 @@ class TicTacToeEnv(gym.Env):
         # Game not over
         self.gameOver = False
         return None
-    
-    
