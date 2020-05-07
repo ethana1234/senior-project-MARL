@@ -1,7 +1,0 @@
-README.md
-setup.py
-connect4env.egg-info/PKG-INFO
-connect4env.egg-info/SOURCES.txt
-connect4env.egg-info/dependency_links.txt
-connect4env.egg-info/requires.txt
-connect4env.egg-info/top_level.txt

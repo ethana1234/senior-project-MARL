@@ -1,0 +1,6 @@
+setup.py
+backgammon.egg-info/PKG-INFO
+backgammon.egg-info/SOURCES.txt
+backgammon.egg-info/dependency_links.txt
+backgammon.egg-info/requires.txt
+backgammon.egg-info/top_level.txt
