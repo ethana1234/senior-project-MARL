@@ -6,7 +6,6 @@ BOARD_ROWS,BOARD_COLS = 6,7
 TOTAL_BOARD_SPACES = BOARD_ROWS*BOARD_COLS
 COORD_TO_INDEX = lambda x : (x[0] * BOARD_ROWS) + x[1]
 
-
 class Connect4Env(gym.Env):
     '''Class that implements the Gym Environment Interface'''
     metadata = {'render.modes': ['human']}
@@ -24,6 +23,7 @@ class Connect4Env(gym.Env):
     
     def reset(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.curRows = {curRow: BOARD_ROWS for curRow in range(BOARD_COLS)}
         self.gameOver = False
         self.playerTurn = 1
         
@@ -36,12 +36,12 @@ class Connect4Env(gym.Env):
             self.gameOver = True
         # Switch to other player
         self.playerTurn = -1 if self.playerTurn == 1 else 1
-        return self.board, reward, self.gameOver, self.getHash()
+        return self.curRows, reward, self.gameOver, self.getHash()
     
     def render(self):
         # p1: x  p2: o
         for i in range(0, BOARD_ROWS):
-            print('-------------')
+            print('----------------------------')
             out = '| '
             for j in range(0, BOARD_COLS):
                 if self.board[i, j] == 1:
@@ -52,17 +52,7 @@ class Connect4Env(gym.Env):
                     token = ' '
                 out += token + ' | '
             print(out)
-        print('-------------')
-        
-    def availablePositions(self):
-        '''Update vacant positions after a turn is made'''
-        positions = []
-        for i in range(BOARD_ROWS):
-            for j in range(BOARD_COLS):
-                if self.board[i,j] == 0:
-                    # Coordinates need to be in tuple form
-                    positions.append((i,j))
-        return positions
+        print('----------------------------')
         
     def getHash(self):
         '''Get a unique hash value that corresponds with the current board state
@@ -81,8 +71,7 @@ class Connect4Env(gym.Env):
 
         # handle empty array
         if n == 0:
-            return np.array([]), np.array([]), np.array([])
-
+            return None
         else:
             # find run starts
             loc_run_start = np.empty(n, dtype=bool)
@@ -124,7 +113,7 @@ class Connect4Env(gym.Env):
                     
         
         # Tie
-        if not len(self.availablePositions()):
+        if (self.board == 0).sum() == 0:
             return (0.1, 0.5)
         
         # Game not over
