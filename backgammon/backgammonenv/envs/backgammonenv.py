@@ -57,24 +57,8 @@ class BackgammonEnv(gym.Env):
     def render(self):
         print(self.board)
         
-    def getValidMoves(self):
-        '''roll and get valid moves from board'''
-        
-        possibleMoves = np.array([])
-        self.roll = (np.random.randint(1,7), np.random.randint(1,7))
-        move1 = useRoll(self.roll[0]) #this is an array of possible from/to moves for roll 0
-        move2 = useRoll(self.roll[1]) #array of possible from/to moves for roll 1
-        moveComb = useRoll(self.roll[0] + self.roll[1]) #array of possible from/to moves using both rolls at once
-        if self.roll[0]==self.roll[1]
-            move3 = useRoll(self.roll[0])
-            move4 = useRoll(self.roll[1])
-            possibleMoves.append(np.array([move1,move2,move3,move4]))
-        else
-            possibleMoves.append(np.array([move1,move2]))
-        return possibleMoves
 
-
-    def bearOff(self):
+    def bearOff(self, board):
         tot = sum(np.array([self.board[position][0] for position in self.homePts[self.playerTurn] if self.playerTurn == self.board[position][1]]))
         return tot == (ALL_CHECKERS - self.out[self.playerTurn])
 
@@ -96,18 +80,18 @@ class BackgammonEnv(gym.Env):
         return False
 '''
 
-    def useRoll(self, roll):
+    def availablePositions(self, board, roll):
         opponent = 1 - self.playerTurn
-        possibleMove = np.array([])
+        possibleMoves = np.array([])
         for i in range(TOT_BOARD_PTS):
             if board[i][0] > 0 and board[i][1] == self.playerTurn:
                 target = roll + i
                 if target < 0 or target > 23:
-                    return self.bearOff()
+                    return self.bearOff(board)
                 if board[target][0] < 2 or self.board[target][1] != opponent:
                     #validMove
-                    possibleMove.append((i,target))
-        return possibleMove
+                    possibleMoves.append((i,target))
+        return possibleMoves
 
         
     def getHash(self):
