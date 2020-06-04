@@ -177,9 +177,9 @@ class BackgammonEnv(gym.Env):
         
     def winner(self):
         '''After each move, check if there's a winner and give out rewards'''
-        if self.board[WHITE_HOME][WHITE_CHECKERS] == ALL_CHECKERS:
+        if self.board[WHITE_HOME] == ALL_CHECKERS:
             return (1,0)
-        if self.board[BLACK_HOME][BLACK_CHECKERS] == ALL_CHECKERS:
+        if self.board[BLACK_HOME] == ALL_CHECKERS:
             return (0,1)
         # Game not over
         return None
