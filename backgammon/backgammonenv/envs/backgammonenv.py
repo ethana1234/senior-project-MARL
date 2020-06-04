@@ -17,7 +17,7 @@ class BackgammonEnv(gym.Env):
         self.action_space = spaces.Discrete(TOT_BOARD_PTS)
         self.observation_space = spaces.Discrete(TOT_BOARD_PTS)
         self.homePts = {WHITE: [i for i in range(18,24)], BLACK: [i for i in range(6)]}
-        self.board = np.array([[0, None]] * TOT_BOARD_PTS + 3) # add 3 extra locations for homes and bar
+        self.board = np.array([[0, None]] * (TOT_BOARD_PTS + 3)) # add 3 extra locations for homes and bar
         self.board[1] = [2, WHITE]
         self.board[12] = [5, WHITE]
         self.board[17] = [3, WHITE]
@@ -35,7 +35,7 @@ class BackgammonEnv(gym.Env):
         self.roll = (np.random.randint(1,7), np.random.randint(1,7))
     
     def reset(self):
-        self.board = np.array([[0, None]] * TOT_BOARD_PTS + 3)
+        self.board = np.array([[0, None]] * (TOT_BOARD_PTS + 3))
         self.board[1] = [2, WHITE]
         self.board[12] = [5, WHITE]
         self.board[17] = [3, WHITE]
@@ -77,7 +77,47 @@ class BackgammonEnv(gym.Env):
         return self.board, reward, self.gameOver, self.getHash()
     
     def render(self):
-        print(self.board)
+        board_string = []
+        # Find max checker stack
+        maxlen = 0
+        for spot in self.board[BAR_IND + 1:WHITE_HOME]:
+            maxlen = spot[0] if spot[0] > maxlen else maxlen
+        # Left side of board
+        for t,b in zip(range(13,19),range(12,6,-1)):
+            top,bottom = self.board[t],self.board[b]
+            board_column = [f'{t:2}','--']
+            checker = 'B' if top[1] == BLACK else 'W'
+            board_column += [f'{checker} ' for i in range(top[0])]
+            board_column += [f'  ' for i in range(maxlen - top[0])]
+            board_column.append(f'--')
+            board_column += [f'  ' for i in range(maxlen - bottom[0])]
+            board_column += [f'{checker} ' for i in range(bottom[0])]
+            board_column += ['--',f'{b:2}']
+            board_string.append(np.array(board_column))
+        # Bar
+        bar_string = ['   ','---'] + ['   ' for i in range(maxlen*2+1)] + ['---','   ']
+        for i in range(self.board[BAR_IND][0]):
+            bar_string[-(i+3)] = ' W '
+        for i in range(self.board[BAR_IND][1]):
+            bar_string[i+2] = ' B '
+        board_string.append(np.array(bar_string))
+        # Right side of board
+        for t,b in zip(range(19,25),range(6,0,-1)):
+            top,bottom = self.board[t],self.board[b]
+            board_column = [f'{t:2}','--']
+            checker = 'B' if top[1] == BLACK else 'W'
+            board_column += [f'{checker} ' for i in range(top[0])]
+            board_column += [f'  ' for i in range(maxlen - top[0])]
+            board_column.append(f'--')
+            board_column += [f'  ' for i in range(maxlen - bottom[0])]
+            board_column += [f'{checker} ' for i in range(bottom[0])]
+            board_column += ['--',f'{b:2}']
+            board_string.append(np.array(board_column))
+        # Joining columns together
+        board_string = np.stack(board_string).T
+        print('\n'.join('|'.join(x for x in row) for row in board_string))
+        
+
         
     def getValidMoves(self):
         '''roll and get valid moves from board'''
@@ -133,7 +173,7 @@ class BackgammonEnv(gym.Env):
     def getHash(self):
         '''Get a unique hash value that corresponds with the current board state
         This is used to store the board state in a state-value dictionary'''
-        return str(self.board.reshape(TOT_BOARD_PTS))
+        return str(self.board.reshape(TOT_BOARD_PTS + 3))
         
     def winner(self):
         '''After each move, check if there's a winner and give out rewards'''
